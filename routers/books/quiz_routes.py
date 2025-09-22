@@ -38,18 +38,40 @@ async def generate_quiz(request: Request, db: Session = Depends(get_db)):
                     {
                         "type": "text",
                         "text": f"""
-                           I'm building a book reading website. 
-                           generate 3 quizes based on book content. 
-                           The format should be          
-                           ```<"question": "xxx", "answer": [<"text": "aaa", "correct": "False">, <"text": "bbb", "correct": "True">]>```
-                           the option answers would be flexible from 3 and correct answer'index should be random, not always second. 
+                           I'm building a book reading website and need to generate quizzes based on the book's content embedded on this assistant. 
+                            Generate exactly 3 quizzes based on the book content. final respose must follow this exact JSON format:
+                            ```json
+                            [
+                                <
+                                    "question": "xxx",
+                                    "answer": [
+                                        <"text": "aaa", "correct": false>,
+                                        <"text": "bbb", "correct": true>,
+                                        <"text": "ccc", "correct": false>
+                                    ]
+                                >,
+                                <
+                                    "question": "xxx",
+                                    "answer": [
+                                        <"text": "aaa", "correct": false>,
+                                        <"text": "bbb", "correct": true>,
+                                        <"text": "ccc", "correct": false>
+                                    ]
+                                >,
+                                <
+                                    "question": "xxx",
+                                    "answer": [
+                                        <"text": "aaa", "correct": false>,
+                                        <"text": "bbb", "correct": true>,
+                                        <"text": "ccc", "correct": false>
+                                    ]
+                                >
+                            ]
+                            ```
 
-                           The response should be logically correct according to the book content and languages should be same book language.
-                           in response, replace all "<" with curly bracket.
-                           Just only return the question.
                         """
                     },
-            ]
+            ],
         )
 
         run = client.beta.threads.runs.create_and_poll(
@@ -61,6 +83,7 @@ async def generate_quiz(request: Request, db: Session = Depends(get_db)):
         if run.status == 'completed':
             print("Run completed successfully. Processing messages.")
             messages = client.beta.threads.messages.list(thread_id=run.thread_id, run_id=run.id)
+            print("messages", messages)
             for msg in messages.data:
                 if msg.role == "assistant":
                     for content_item in msg.content: 
@@ -73,46 +96,42 @@ async def generate_quiz(request: Request, db: Session = Depends(get_db)):
                 else:
                     response = f"User says: {msg.content}"
                     print(f"Processing user message: {response}")
-        
+
         # Extract JSON objects from the answer_text and add them to quiz_list
-        pattern = r'```(.*?)```'  # Define regex pattern to match code enclosed in ```
+        pattern = r'```json(.*?)```'  # Define regex pattern to match code enclosed in ```
         matches = re.findall(pattern, res_message, re.DOTALL)  # Find all matches of the pattern
         quizzes = []
-        
-        for quiz_answer in matches:
-            json_pattern = r'\{.*\}'
 
-            # Use re.search to find the JSON object in the string
-            match = re.search(json_pattern, quiz_answer, re.DOTALL)
+        _matches = json.loads(matches[0])
 
-            if match:
-                quiz_answer = json.loads(match.group())
+        for quiz_answer in _matches:
+            print("quiz_answer", quiz_answer)
 
-                if quiz_answer['question'] or quiz_answer['answer']:
-                    quiz = {"question": "", "answer": [], 'id': ''}
+            if quiz_answer['question'] or quiz_answer['answer']:
+                quiz = {"question": "", "answer": [], 'id': ''}
 
-                    # Create new quiz in database
-                    new_quiz = Quiz(
-                        book_id=book.id,
-                        user_id=user.id,
-                        question=quiz_answer['question'],
-                        answer=quiz_answer['answer']
-                    )
-                    db.add(new_quiz)
-                    db.commit()
-                    db.refresh(new_quiz)
+                # Create new quiz in database
+                new_quiz = Quiz(
+                    book_id=book.id,
+                    user_id=user.id,
+                    question=quiz_answer['question'],
+                    answer=quiz_answer['answer']
+                )
+                db.add(new_quiz)
+                db.commit()
+                db.refresh(new_quiz)
 
-                    quiz['question'] = quiz_answer['question']
-                    quiz['id'] = new_quiz.id  # Add the quiz ID to the response
+                quiz['question'] = quiz_answer['question']
+                quiz['id'] = new_quiz.id  # Add the quiz ID to the response
 
-                    for answer in quiz_answer['answer']:   
-                        quiz['answer'].append(answer['text'])
-                quizzes.append(quiz)
+                for answer in quiz_answer['answer']:   
+                    quiz['answer'].append(answer['text'])
+            quizzes.append(quiz)
         return {"success": True, 'quizzes': quizzes}
 
     except Exception as e:
         print(f"Error while generating quiz: {e}")
-        return {"success": False, "data": 'Error while generating quiz'}
+        return {"success": False,  'quizzes': [], "data": 'Error while generating quiz'}
 
 @router.post("/submit-answer")
 async def answer_quiz(request: Request, db: Session = Depends(get_db)):

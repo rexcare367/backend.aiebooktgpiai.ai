@@ -1,6 +1,6 @@
 from fastapi import APIRouter, File, UploadFile, Depends, Request, Response, BackgroundTasks
 from sqlalchemy.orm import Session
-from services.aws_resources import S3_CLIENT, S3_REGION, quizzes_table, rewards_table, highlights_table, reading_statistics_table, reading_history_table, ic_numbers_table, ebook_table, EBOOK_TAG_TABLE, ic_numbers_table, cognito
+from services.aws_resources import S3_CLIENT, AWS_REGION, quizzes_table, rewards_table, highlights_table, reading_statistics_table, reading_history_table, ic_numbers_table, ebook_table, EBOOK_TAG_TABLE, ic_numbers_table, cognito
 from boto3.dynamodb.conditions import Attr
 from datetime import datetime
 import uuid
@@ -9,7 +9,7 @@ from database.models import Books, User, Rewards, FavoriteBooks, Quiz, HighLight
 from sqlalchemy import text
 
 # S3 Bucket
-region = S3_REGION
+region = AWS_REGION
 BUCKET_NAME = "chatbot-voice-clip"
 
 router = APIRouter(
@@ -30,7 +30,7 @@ async def route(file: UploadFile = File(...), res: Response = Response()):
     # Upload to S3
     try:
         S3_CLIENT.put_object(**upload_params)
-        file_url = f"https://{BUCKET_NAME}.s3.{S3_REGION}.amazonaws.com/{file_key}"
+        file_url = f"https://{BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{file_key}"
 
         return {"file_url": file_url, "filename": file.filename, 'file_key': file_key}
     except Exception as e:

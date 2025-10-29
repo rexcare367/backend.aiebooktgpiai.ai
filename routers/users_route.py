@@ -83,10 +83,9 @@ def route_add_user(
 def route_update_user(
     user_id: str = Path(..., description="User ID"),
     user_data: dict = Body(..., description="Updated user data"),
-    db: Session = Depends(get_db_session)
 ):
     """Update an existing user's information"""
-    return update_user(user_id, user_data, db)
+    return update_user(user_id, user_data)
 
 @router.delete("/{user_id}", summary="Delete one user")
 def route_delete_user(

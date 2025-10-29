@@ -20,12 +20,12 @@ S3_CLIENT = boto3.client(
     's3',
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-    region_name=os.getenv("S3_REGION")
+    region_name=os.getenv("AWS_REGION")
 )
 
 dynamodb = boto3.resource(
     'dynamodb',
-    region_name=os.getenv("DYNAMODB_REGION"),
+    region_name=os.getenv("AWS_REGION"),
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
 )
@@ -146,7 +146,7 @@ def process_files():
                 }
                 S3_CLIENT.put_object(**upload_params)
                 
-            thumbfile_url = f"https://{EBOOK_BUCKET}.s3.{os.getenv('S3_REGION')}.amazonaws.com/{THUMBFILES_FOLDER}{file_key.replace('_', '+')}"
+            thumbfile_url = f"https://{EBOOK_BUCKET}.s3.{os.getenv('AWS_REGION')}.amazonaws.com/{THUMBFILES_FOLDER}{file_key.replace('_', '+')}"
 
             doc.close()
 
@@ -156,7 +156,7 @@ def process_files():
             print(f"Error processing file {file_key}: {e}")
             continue
 
-        file_url = f"https://{EBOOK_BUCKET}.s3.{os.getenv('S3_REGION')}.amazonaws.com/{COMPRESSED_FOLDER}{file_key}"
+        file_url = f"https://{EBOOK_BUCKET}.s3.{os.getenv('AWS_REGION')}.amazonaws.com/{COMPRESSED_FOLDER}{file_key}"
         # Upload to S3 and save metadata to DynamoDB
         table.put_item(
             Item={

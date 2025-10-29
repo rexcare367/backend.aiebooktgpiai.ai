@@ -336,7 +336,7 @@ def compress_indexed_pdfs(env_vars: dict, max_workers: int = 4) -> dict:
     compressor = PDFCompressor(
         aws_access_key_id=env_vars['S3_ACCESS_KEY_ID'],
         aws_secret_access_key=env_vars['S3_SECRET_ACCESS_KEY'],
-        region=env_vars['S3_REGION'],
+        region=env_vars['AWS_REGION'],
         bucket=env_vars['S3_BUCKET'],
         indexed_prefix=env_vars['S3_INDEXED_PREFIX'],
         compressed_prefix=env_vars['S3_COMPRESSED_PREFIX'],
@@ -354,7 +354,7 @@ if __name__ == "__main__":
     env_vars = {
         'S3_ACCESS_KEY_ID': os.getenv('S3_ACCESS_KEY_ID'),
         'S3_SECRET_ACCESS_KEY': os.getenv('S3_SECRET_ACCESS_KEY'),
-        'S3_REGION': os.getenv('S3_REGION'),
+        'AWS_REGION': os.getenv('AWS_REGION'),
         'S3_BUCKET': os.getenv('S3_BUCKET'),
         'S3_INDEXED_PREFIX': os.getenv('S3_INDEXED_PREFIX'),
         'S3_COMPRESSED_PREFIX': os.getenv('S3_COMPRESSED_PREFIX')
@@ -364,7 +364,7 @@ if __name__ == "__main__":
     required_vars = [
         'S3_ACCESS_KEY_ID', 
         'S3_SECRET_ACCESS_KEY', 
-        'S3_REGION', 
+        'AWS_REGION', 
         'S3_BUCKET',
         'S3_INDEXED_PREFIX',
         'S3_COMPRESSED_PREFIX'

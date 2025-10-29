@@ -26,12 +26,12 @@ S3_CLIENT = boto3.client(
     's3',
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-    region_name=os.getenv("S3_REGION")
+    region_name=os.getenv("AWS_REGION")
 )
 
 dynamodb = boto3.resource(
     'dynamodb',
-    region_name=os.getenv("DYNAMODB_REGION"),
+    region_name=os.getenv("AWS_REGION"),
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
 )
@@ -238,7 +238,7 @@ def process_ebooks():
                         )
                     
                     # Generate thumbnail URL
-                    thumbnail_url = f"https://{EBOOK_BUCKET}.s3.{os.getenv('S3_REGION')}.amazonaws.com/{thumbnail_key}"
+                    thumbnail_url = f"https://{EBOOK_BUCKET}.s3.{os.getenv('AWS_REGION')}.amazonaws.com/{thumbnail_key}"
                     
                     # Update DynamoDB
                     update_dynamodb(file_key, thumbnail_url)

@@ -90,7 +90,7 @@ class EbookProcessor:
         """Initialize and validate AWS clients"""
         try:
             # Check for required environment variables
-            required_vars = ['DYNAMODB_ACCESS_KEY_ID', 'DYNAMODB_SECRET_ACCESS_KEY', 'DYNAMODB_REGION', 'DYNAMODB_ID_AND_TAG']
+            required_vars = ['DYNAMODB_ACCESS_KEY_ID', 'DYNAMODB_SECRET_ACCESS_KEY', 'AWS_REGION', 'DYNAMODB_ID_AND_TAG']
             missing_vars = [var for var in required_vars if not os.getenv(var)]
             
             if missing_vars:
@@ -100,7 +100,7 @@ class EbookProcessor:
             self.session = boto3.Session(
                 aws_access_key_id=os.getenv('DYNAMODB_ACCESS_KEY_ID'),
                 aws_secret_access_key=os.getenv('DYNAMODB_SECRET_ACCESS_KEY'),
-                region_name=os.getenv('DYNAMODB_REGION')
+                region_name=os.getenv('AWS_REGION')
             )
             
             # Initialize DynamoDB and validate connection

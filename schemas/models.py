@@ -43,6 +43,17 @@ class ResetPasswordRequest(BaseModel):
             raise ValueError('Password must be at least 8 characters long')
         return v
 
+class CognitoResetPasswordRequest(BaseModel):
+    email: EmailStr
+    confirmation_code: str
+    new_password: str
+    
+    @validator('new_password')
+    def validate_new_password(cls, v):
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        return v
+
 class UserAuthResponse(BaseModel):
     success: bool
     message: str

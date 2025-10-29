@@ -43,12 +43,12 @@ class EbookProcessor:
             's3',
             aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
             aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-            region_name=os.getenv("S3_REGION")
+            region_name=os.getenv("AWS_REGION")
         )
         
         self.dynamodb = boto3.resource(
             'dynamodb',
-            region_name=os.getenv("DYNAMODB_REGION"),
+            region_name=os.getenv("AWS_REGION"),
             aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
             aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
         )
@@ -202,7 +202,7 @@ class EbookProcessor:
                         'normalized_name': safe_filename,
                         'upload_time': datetime.utcnow().isoformat(),
                         'status': 'uploaded',  # Changed from 'indexed' since we're not embedding
-                        'url': f"https://{self.INDEXED_BUCKET}.s3.{os.getenv('S3_REGION')}.amazonaws.com/{s3_key}"
+                        'url': f"https://{self.INDEXED_BUCKET}.s3.{os.getenv('AWS_REGION')}.amazonaws.com/{s3_key}"
                     }
                 )
                 

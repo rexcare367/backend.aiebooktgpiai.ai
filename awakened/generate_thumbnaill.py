@@ -25,7 +25,7 @@ logger.addHandler(file_handler)
 # DynamoDB and S3 clients
 dynamodb = boto3.resource(
     'dynamodb',
-    region_name=os.getenv("DYNAMODB_REGION"),
+    region_name=os.getenv("AWS_REGION"),
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
 )
@@ -33,7 +33,7 @@ s3 = boto3.client(
     's3',
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-    region_name=os.getenv("S3_REGION")
+    region_name=os.getenv("AWS_REGION")
 )
 
 INDEXED_BUCKET = "primary-school-ebook-data"
@@ -97,7 +97,7 @@ def generate_thumbnail(pdf_url, book_id):
             # s3.put_object(Bucket='thumbnails', Key=f'{book_id}.jpg', Body=thumbnail_buffer.getvalue())
             logger.info(f'Thumbnail generated for book ID: {book_id}')
             # return f'{THUMBNAIL_PREFIX}{book_name}.jpg'
-            return f"https://{INDEXED_BUCKET}.s3.{os.getenv('S3_REGION')}.amazonaws.com/{THUMBNAIL_PREFIX}{book_name}.jpg"
+            return f"https://{INDEXED_BUCKET}.s3.{os.getenv('AWS_REGION')}.amazonaws.com/{THUMBNAIL_PREFIX}{book_name}.jpg"
         
         else:
             logger.error(f'Failed to download PDF for book ID: {book_id}')
